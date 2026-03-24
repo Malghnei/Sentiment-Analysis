@@ -1,0 +1,12 @@
+version = 0.1
+
+[default.deploy.parameters]
+stack_name = "sentiment"
+resolve_s3 = true
+s3_prefix = "sentiment"
+capabilities = "CAPABILITY_IAM"
+image_repositories = ["SentimentFunction=532070088924.dkr.ecr.us-east-2.amazonaws.com/sentimentc40eb515/sentimentfunction35d37012repo"]
+confirm_changeset = true
+
+[default.global.parameters]
+region = "us-east-2"

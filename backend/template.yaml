@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Sentiment Analysis Serverless API with Container Image
+
+Resources:
+  SentimentApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      CorsConfiguration:
+        AllowOrigins:
+          - "*"
+
+        AllowHeaders:
+          - "Content-Type"
+          - "Authorization"
+        AllowMethods:
+          - "POST"
+          - "OPTIONS"
+          - "GET"
+
+  SentimentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      MemorySize: 3008 # High memory is recommended for running PyTorch models
+      Timeout: 300
+      Events:
+        ApiEvent:
+          Type: HttpApi
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+            ApiId: !Ref SentimentApi
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: .
+      DockerTag: python3.10-v1
+
+Outputs:
+  ApiUrl:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${SentimentApi}.execute-api.${AWS::Region}.amazonaws.com/"

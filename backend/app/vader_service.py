@@ -1,6 +1,6 @@
 from nltk.sentiment import SentimentIntensityAnalyzer
 
-# Initialize analyzer once globally to cache it between Lambda invocations
+# Initialize analyzer once at import so every request reuses it
 sia = SentimentIntensityAnalyzer()
 
 def analyze_vader(text: str) -> dict:

@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from mangum import Mangum
 from pydantic import BaseModel
 from typing import List, Union
 
@@ -68,5 +67,3 @@ def analyze_sentiment(item: Union[TextItem, TextBatch]):
     logger.info(f"Full request processed in {end_time - start_time:.2f} seconds")
     return {"results": final_results}
 
-# Wraps the FastAPI app for execution inside AWS Lambda
-handler = Mangum(app)

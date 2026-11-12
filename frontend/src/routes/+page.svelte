@@ -9,7 +9,7 @@
   let errorMsg = $state('');
   
   // API URL from .env, fallback to localhost for tests
-  const API_URL = env.PUBLIC_AWS_API_URL || 'http://localhost:3000';
+  const API_URL = env.PUBLIC_API_URL || 'http://localhost:7860';
 
   async function analyzeText(texts: string[]) {
     if (!texts.length) return;

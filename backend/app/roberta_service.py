@@ -9,7 +9,7 @@ logger.setLevel(logging.INFO)
 
 MODEL_NAME = "cardiffnlp/twitter-roberta-base-sentiment-latest"
 
-# Global initialization so it is cached in the warm Lambda execution environment
+# Load once at import so every request reuses the model
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, use_safetensors=True)
 model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME, use_safetensors=True)
 

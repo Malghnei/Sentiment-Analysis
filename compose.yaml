@@ -1,0 +1,22 @@
+# Runs the API behind Caddy, which gets and renews the HTTPS certificate for $DOMAIN.
+services:
+  api:
+    build: ./backend
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:?set DOMAIN in .env (see .env.example)}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+    depends_on:
+      - api
+
+volumes:
+  caddy_data:

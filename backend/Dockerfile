@@ -1,7 +1,7 @@
-# Hugging Face Spaces image (free CPU tier)
+# API image: CPU-only PyTorch, models baked in, served on 7860
 FROM python:3.12-slim
 
-# Spaces run the container as UID 1000
+# Run as an unprivileged user
 RUN useradd -m -u 1000 user
 USER user
 ENV HOME=/home/user PATH=/home/user/.local/bin:$PATH

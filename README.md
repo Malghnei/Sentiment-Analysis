@@ -6,7 +6,7 @@ This project provides a full-stack application for analyzing the sentiment of Am
 The project is structured as a monorepo containing two main components:
 
 ### Backend (Python/FastAPI)
-The backend is a REST API packaged as a Docker container and hosted for free on Hugging Face Spaces.
+The backend is a REST API packaged as a Docker container, self-hosted on an Oracle Cloud Always Free VM behind Caddy (automatic HTTPS).
 *   **Framework**: FastAPI for high-performance API routing and validation.
 *   **Machine Learning**:
     *   **RoBERTa**: Deep learning model for advanced sentiment classification (via Hugging Face Transformers).
@@ -18,11 +18,22 @@ Run locally:
 docker build -t sentiment backend && docker run -p 7860:7860 sentiment
 ```
 
-Deploy (pushes only `backend/` to the Space; use a Hugging Face write token as the password):
+Deploy on the VM (needs Docker, ports 80/443 open, and a domain such as a free DuckDNS name pointing at the VM):
 ```bash
-git remote add space https://huggingface.co/spaces/<user>/<space>
-git subtree push --prefix backend space main
+git clone https://github.com/Malghnei/Sentiment-Analysis.git && cd Sentiment-Analysis
+cp .env.example .env   # set DOMAIN
+docker compose up -d --build
 ```
+Update: `git pull && docker compose up -d --build`.
+
+Oracle Cloud specifics (one-time, on the VM):
+- **Open 80/443 in two places.** OCI Console → your instance's subnet → Security List → add Ingress rules for TCP 80 and 443 from `0.0.0.0/0`. The Ubuntu images also ship host iptables rules that reject everything but SSH:
+  `sudo iptables -I INPUT 6 -p tcp -m multiport --dports 80,443 -j ACCEPT && sudo netfilter-persistent save`
+  (Oracle Linux instead: `sudo firewall-cmd --permanent --add-service={http,https} && sudo firewall-cmd --reload`.)
+- **Docker:** `curl -fsSL https://get.docker.com | sudo sh && sudo usermod -aG docker $USER` (log out/in after).
+- **Shape:** the Ampere A1 (ARM) shape works as-is (PyTorch ships ARM CPU wheels). The 1 GB `E2.1.Micro` shape will run out of memory building/loading RoBERTa; add swap first:
+  `sudo fallocate -l 4G /swapfile && sudo chmod 600 /swapfile && sudo mkswap /swapfile && sudo swapon /swapfile && echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab`
+- **Frontend:** set `PUBLIC_API_URL=https://<DOMAIN>` in the Netlify site's environment variables and redeploy.
 
 ### Frontend (SvelteKit)
 The frontend provides a fast, responsive user interface to interact with the sentiment API.
